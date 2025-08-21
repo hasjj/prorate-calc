@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prorated Compensation Calculator by HASJJ</title>
+  <style>
+    :root {
+      --gap: 12px;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", "맑은 고딕", Roboto, Helvetica, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f7f7f9;
+      color: #111;
+      line-height: 1.5;
+    }
+    h1 {
+      font-size: 1.25rem;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.2px;
+    }
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      margin-bottom: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+    }
+    .row { display: flex; gap: var(--gap); }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: #333;
+    }
+    input[type="date"], input[type="text"] {
+      width: 100%;
+      padding: 12px 12px;
+      border: 1px solid #d8d8de;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+    input[type="date"]:focus, input[type="text"]:focus {
+      border-color: #8aa9ff;
+      box-shadow: 0 0 0 3px rgba(58,108,217,0.15);
+    }
+    .muted { color: #666; font-size: 0.9rem; }
+    .btn {
+      width: 100%;
+      padding: 14px 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: #2c5cff;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn.secondary {
+      background: #f0f2f8;
+      color: #222;
+      border: 1px solid #e0e3ec;
+    }
+    .error {
+      color: #c20000;
+      background: #fff1f1;
+      border: 1px solid #ffd3d3;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+    .result {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .result .value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .result .sub {
+      color: #666;
+      font-size: 0.95rem;
+    }
+    .desc {
+      font-size: 0.92rem;
+      color: #444;
+      margin-top: 8px;
+    }
+    .logs {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.92rem;
+    }
+    .log-item {
+      padding: 10px 12px;
+      border: 1px solid #ececf2;
+      background: #fff;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .log-item:hover { background: #f7faff; border-color: #e1e8ff; }
+    .log-left { color: #333; overflow: hidden; text-overflow: ellipsis; }
+    .log-right {
+      font-weight: 700;
+      color: #111;
+      flex-shrink: 0;
+    }
+    .small {
+      font-size: 0.86rem;
+      color: #666;
+    }
+    .log-right .small {
+      font-weight: 400;
+      margin-left: 6px;
+      color: #666;
+    }
+    .date-field { display: flex; align-items: center; gap: 10px; }
+    .date-field .seg { display: flex; align-items: center; gap: 8px; }
+    .date-field .seg input[type="text"] { padding: 12px 10px; border: 1px solid #d8d8de; border-radius: 10px; font-size: 1rem; }
+    .date-field .seg .yyyy { width: 8ch; text-align: center; }
+    .date-field .seg .mm, .date-field .seg .dd { width: 6ch; text-align: center; }
+    .picker-btn { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; cursor: pointer; font-size: 0.9rem; }
+    .picker-btn:active { transform: translateY(1px); }
+    .native-date { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
+    .divider { height: 1px; background: #ececf2; margin: 10px 0 14px; }
+    .footer { text-align: center; color: #777; font-size: 0.85rem; margin: 24px 0 8px; }
+    .footer a { color: inherit; text-decoration: none; border-bottom: 1px dotted #bbb; }
+    .footer a:hover { text-decoration: underline; }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <h1>보수총액 일할계산기 by HASJJ (v.2025.08)</h1>
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label>기준기간 시작일</label>
+        <div class="date-field" data-for="baseStart">
+          <div class="seg">
+            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+          </div>
+          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
+          <input id="baseStart" type="date" class="native-date" />
+        </div>
+      </div>
+      <div>
+        <label>기준기간 종료일</label>
+        <div class="date-field" data-for="baseEnd">
+          <div class="seg">
+            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+          </div>
+          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
+          <input id="baseEnd" type="date" class="native-date" />
+        </div>
+      </div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="grid">
+        <div>
+        <label>기준기간 보수총액 (원)</label>
+        <input id="baseAmount" type="text" inputmode="numeric" placeholder="예: 12,345,678" />
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="grid">
+        <div>
+        <label>조회기간 시작일</label>
+        <div class="date-field" data-for="queryStart">
+          <div class="seg">
+            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+          </div>
+          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
+          <input id="queryStart" type="date" class="native-date" />
+        </div>
+        </div>
+        <div>
+        <label>조회기간 종료일</label>
+        <div class="date-field" data-for="queryEnd">
+          <div class="seg">
+            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">-</span>
+            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+          </div>
+          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
+          <input id="queryEnd" type="date" class="native-date" />
+        </div>
+        </div>
+    </div>
+    <div style="height:12px"></div>
+    <button id="calcBtn" class="btn">일할계산하기</button>
+    <div id="error" class="error" style="display:none"></div>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <div class="result">
+      <div class="value" id="resultValue">₩0</div>
+      <div class="sub" id="resultSub"></div>
+    </div>
+    <div class="desc muted">일수 계산: 시작일과 종료일 모두 포함(포함 기준). 주말/공휴일 미구분, 단순 일수 기준. 금액은 소수점 이하는 올림 처리.</div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content: space-between; align-items:center;">
+      <div class="muted"><strong>최근 20건 로그</strong> (계산 시점 기준)</div>
+      <button id="clearBtn" class="btn secondary" style="width:auto;padding:10px 12px;font-size:0.9rem;">로그 비우기</button>
+    </div>
+    <div class="logs" id="logList"></div>
+    <div class="row" style="justify-content: flex-end; gap: 8px; margin-top: 8px;">
+      <button id="copyBtn" class="btn secondary" style="width:auto;padding:10px 12px;font-size:0.9rem;">로그 복사</button>
+      <button id="saveBtn" class="btn secondary" style="width:auto;padding:10px 12px;font-size:0.9rem;">로그 txt 저장</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Utilities ---
+    const $ = (id) => document.getElementById(id);
+    const fmtKRW = (n) => {
+      try { return new Intl.NumberFormat('ko-KR').format(n); }
+      catch { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    };
+    const parseAmount = (s) => {
+      const digits = (s || '').replace(/[^\d]/g, '');
+      return digits ? Number(digits) : 0;
+    };
+    const setAmountFormat = (el) => {
+      const cursorFromEnd = el.value.length - el.selectionStart;
+      const raw = el.value.replace(/[^\d]/g, '');
+      const formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      el.value = formatted;
+      // try to keep cursor near original spot
+      const newPos = Math.max(0, el.value.length - cursorFromEnd);
+      requestAnimationFrame(() => el.setSelectionRange(newPos, newPos));
+    };
+    const toYmd = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${dd}`;
+    };
+    const daysInclusive = (a, b) => {
+      const ms = 24*60*60*1000;
+      return Math.floor((b - a) / ms) + 1;
+    };
+    const nowStr = () => {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mi = String(d.getMinutes()).padStart(2,'0');
+      return `${y}-${m}-${dd} ${hh}:${mi}`;
+    };
+
+    // --- Date field (segmented) UX ---
+    const pad2 = (n) => String(n).padStart(2, '0');
+    const sanitizeDigits = (el, maxLen) => {
+      el.value = el.value.replace(/[^0-9]/g, '');
+      if (maxLen) el.value = el.value.slice(0, maxLen);
+    };
+    const dateFieldRegistry = {};
+
+    const installDateField = (container) => {
+      const native = container.querySelector('.native-date');
+      const y = container.querySelector('.yyyy');
+      const m = container.querySelector('.mm');
+      const d = container.querySelector('.dd');
+      const btn = container.querySelector('.picker-btn');
+
+      const syncSegToNative = () => {
+        if (y.value.length === 4 && m.value.length >= 1 && d.value.length >= 1) {
+          const yy = Number(y.value);
+          const mm = Number(m.value);
+          const dd = Number(d.value);
+          if (mm >= 1 && mm <= 12) {
+            const test = new Date(Date.UTC(yy, mm - 1, dd));
+            if (test.getUTCFullYear() === yy && test.getUTCMonth() === (mm - 1) && test.getUTCDate() === dd) {
+              native.value = `${yy}-${pad2(mm)}-${pad2(dd)}`;
+              return;
+            }
+          }
+        }
+        // invalid combination: do not update native.value
+      };
+
+      const syncNativeToSeg = () => {
+        if (!native.value) return;
+        const [yy, mm, dd] = native.value.split('-');
+        y.value = yy || '';
+        m.value = (mm || '').replace(/^0/, '');
+        d.value = (dd || '').replace(/^0/, '');
+      };
+
+      y.addEventListener('input', () => { sanitizeDigits(y, 4); if (y.value.length === 4) m.focus(); syncSegToNative(); });
+      m.addEventListener('input', () => { sanitizeDigits(m, 2); if (m.value.length === 2) d.focus(); syncSegToNative(); });
+      d.addEventListener('input', () => { sanitizeDigits(d, 2); syncSegToNative(); });
+
+      m.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && m.value.length === 0) { y.focus(); e.preventDefault(); } });
+      d.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && d.value.length === 0) { m.focus(); e.preventDefault(); } });
+
+      btn.addEventListener('click', () => {
+        if (typeof native.showPicker === 'function') native.showPicker();
+        else native.focus();
+      });
+
+      native.addEventListener('change', syncNativeToSeg);
+      syncNativeToSeg();
+
+      // register in global registry
+      const key = container.getAttribute('data-for');
+      dateFieldRegistry[key] = {
+        native, y, m, d,
+        syncNativeToSeg,
+        setFromYmd: (ymd) => { if (!ymd) return; native.value = ymd; syncNativeToSeg(); }
+      };
+    };
+
+    document.querySelectorAll('.date-field').forEach(installDateField);
+
+    // --- Programmatic setters for date fields and base amount ---
+    const setDateFieldValue = (id, ymd) => {
+      const entry = dateFieldRegistry[id];
+      if (!entry || !ymd) return;
+      entry.setFromYmd(ymd);
+    };
+    const setBaseAmountValue = (n) => {
+      const el = $('baseAmount');
+      el.value = String(n ?? '').replace(/[^0-9]/g, '');
+      setAmountFormat(el);
+    };
+
+    // --- Populate inputs from a log item ---
+    const fillFromLog = (l) => {
+      if (l.bs) setDateFieldValue('baseStart', l.bs);
+      if (l.be) setDateFieldValue('baseEnd', l.be);
+      if (l.qs) setDateFieldValue('queryStart', l.qs);
+      if (l.qe) setDateFieldValue('queryEnd', l.qe);
+      if (typeof l.ba !== 'undefined') setBaseAmountValue(l.ba);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // --- Local Storage for logs ---
+    const LS_KEY = 'prorate_logs_v1';
+    const loadLogs = () => {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch { return []; }
+    };
+    const saveLogs = (logs) => {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(logs)); } catch {}
+    };
+    const addLog = (log) => {
+      const logs = loadLogs();
+      logs.unshift(log); // newest first
+      const trimmed = logs.slice(0, 20);
+      saveLogs(trimmed);
+      renderLogs(trimmed);
+    };
+    const clearLogs = () => { saveLogs([]); renderLogs([]); };
+
+    // --- Log export helpers ---
+    const buildLogsText = () => {
+      const logs = loadLogs();
+      if (!logs.length) return '로그 없음.';
+      const lines = logs.map(l => {
+        const baseInfo = (l.bs && l.be && (typeof l.ba !== 'undefined'))
+          ? ` (기준 ${l.bs} ~ ${l.be} • ₩${fmtKRW(l.ba)})`
+          : '';
+        return `[${l.ts}] 조회기간 ${l.qs} ~ ${l.qe} • ${l.qd}일\t₩${fmtKRW(l.amount)}${baseInfo}`;
+      });
+      return lines.join('\n');
+    };
+    const downloadLogsTxt = () => {
+      const text = buildLogsText();
+      const d = new Date();
+      const ts = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `logs_${ts}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    };
+    const copyLogsToClipboard = async () => {
+      try {
+        await navigator.clipboard.writeText(buildLogsText());
+        alert('로그를 클립보드로 복사했습니다.');
+      } catch (e) {
+        alert('클립보드 복사에 실패했습니다. 브라우저 권한을 확인해 주세요.');
+      }
+    };
+
+    // --- Rendering ---
+    const renderLogs = (logs) => {
+      const box = $('logList');
+      box.innerHTML = '';
+      if (!logs.length) {
+        const div = document.createElement('div');
+        div.className = 'muted';
+        div.textContent = '아직 로그가 없습니다.';
+        box.appendChild(div);
+        return;
+      }
+      logs.forEach(l => {
+        const item = document.createElement('div');
+        item.className = 'log-item';
+        const left = document.createElement('div');
+        left.className = 'log-left';
+        // Emphasize query period; base period/amount intentionally omitted
+        left.textContent = `[${l.ts}] 조회기간 ${l.qs} ~ ${l.qe} • ${l.qd}일`;
+        const right = document.createElement('div');
+        right.className = 'log-right';
+        right.textContent = `₩${fmtKRW(l.amount)}`;
+        if (l.bs && l.be && (typeof l.ba !== 'undefined')) {
+          const meta = document.createElement('span');
+          meta.className = 'small';
+          meta.textContent = ` • 기준 ${l.bs} ~ ${l.be} • ₩${fmtKRW(l.ba)}`;
+          right.appendChild(meta);
+        }
+        else {
+          const meta = document.createElement('span');
+          meta.className = 'small';
+          meta.textContent = ' • 기준 정보 없음';
+          right.appendChild(meta);
+        }
+        item.appendChild(left);
+        item.appendChild(right);
+        item.addEventListener('click', () => fillFromLog(l));
+        box.appendChild(item);
+      });
+    };
+
+    // --- Main calculation ---
+    $('baseAmount').addEventListener('input', (e) => setAmountFormat(e.target));
+
+    $('clearBtn').addEventListener('click', () => {
+      if (confirm('로그를 모두 삭제할까요?')) clearLogs();
+    });
+
+    $('calcBtn').addEventListener('click', () => {
+      $('error').style.display = 'none';
+      const baseStartStr = $('baseStart').value;
+      const baseEndStr   = $('baseEnd').value;
+      const queryStartStr= $('queryStart').value;
+      const queryEndStr  = $('queryEnd').value;
+      const amountRaw    = parseAmount($('baseAmount').value);
+
+      if (!baseStartStr || !baseEndStr || !queryStartStr || !queryEndStr) {
+        return showError('모든 날짜를 입력해 주세요.');
+      }
+      if (!amountRaw || amountRaw <= 0) {
+        return showError('기준기간 보수총액(원)을 정확히 입력해 주세요.');
+      }
+
+      const baseStart = new Date(baseStartStr + 'T00:00:00');
+      const baseEnd   = new Date(baseEndStr   + 'T00:00:00');
+      const queryStart= new Date(queryStartStr+ 'T00:00:00');
+      const queryEnd  = new Date(queryEndStr  + 'T00:00:00');
+
+      if (baseStart > baseEnd) return showError('기준기간의 시작일이 종료일보다 늦을 수 없습니다.');
+      if (queryStart > queryEnd) return showError('조회기간의 시작일이 종료일보다 늦을 수 없습니다.');
+
+      // Rule: 조회기간은 반드시 기준기간 안에 있어야 함 (양 끝 포함)
+      if (queryStart < baseStart || queryEnd > baseEnd) {
+        return showError('오류: 조회기간은 반드시 기준기간 안에 위치해야 합니다.');
+      }
+
+      const baseDays  = daysInclusive(baseStart, baseEnd);   // 포함 기준
+      const queryDays = daysInclusive(queryStart, queryEnd); // 포함 기준
+
+      // Rounding up at the final amount (ceil)
+      // To avoid floating error: ceil(a * q / b) = floor((a*q + b - 1) / b)
+      const numerator = amountRaw * queryDays + (baseDays - 1);
+      const result = Math.floor(numerator / baseDays);
+
+      // Show result
+      $('resultValue').textContent = '₩' + fmtKRW(result);
+      $('resultSub').textContent = `(조회기간 ${toYmd(queryStart)} ~ ${toYmd(queryEnd)} • ${queryDays}일 / 기준기간 ${toYmd(baseStart)} ~ ${toYmd(baseEnd)} • ${baseDays}일, 기준금액 ₩${fmtKRW(amountRaw)})`;
+      $('resultCard').style.display = 'block';
+
+      // Add log (only essential info emphasized per spec)
+      addLog({
+        ts: nowStr(),
+        qs: toYmd(queryStart),
+        qe: toYmd(queryEnd),
+        qd: queryDays,
+        amount: result,
+        bs: toYmd(baseStart),
+        be: toYmd(baseEnd),
+        ba: amountRaw
+      });
+    });
+
+    $('copyBtn').addEventListener('click', copyLogsToClipboard);
+    $('saveBtn').addEventListener('click', downloadLogsTxt);
+
+    function showError(msg) {
+      const el = $('error');
+      el.textContent = msg;
+      el.style.display = 'block';
+      $('resultCard').style.display = 'none';
+    }
+
+    // First render
+    renderLogs(loadLogs());
+  </script>
+
+  <footer class="footer">
+    <div>© 2025 Hyun Gon Kim · 사랑하는 아내를 위해 만든 업무도구 · ChatGPT와 함께 만들었습니다</div>
+    <div><a href="mailto:hyungonkim@me.com">hyungonkim@me.com</a></div>
+  </footer>
+</body>
+</html>
