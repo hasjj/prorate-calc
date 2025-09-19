@@ -146,19 +146,6 @@
     .date-field .seg input[type="text"] { padding: 12px 10px; border: 1px solid #d8d8de; border-radius: 10px; font-size: 1rem; }
     .date-field .seg .yyyy { width: 8ch; text-align: center; }
     .date-field .seg .mm, .date-field .seg .dd { width: 6ch; text-align: center; }
-    .picker-btn { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; cursor: pointer; font-size: 0.9rem; }
-    .picker-btn:active { transform: translateY(1px); }
-    .native-date { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
-    /* iOS: show native date picker, hide segmented UI + button */
-    body.ios .date-field .seg,
-    body.ios .date-field .picker-btn { display: none; }
-    body.ios .date-field .native-date {
-      position: static;
-      opacity: 1;
-      pointer-events: auto;
-      width: 100%;
-      height: auto;
-    }
     .divider { height: 1px; background: #ececf2; margin: 10px 0 14px; }
     .footer { text-align: center; color: #777; font-size: 0.85rem; margin: 24px 0 8px; }
     .footer a { color: inherit; text-decoration: none; border-bottom: 1px dotted #bbb; }
@@ -169,35 +156,31 @@
   </style>
 </head>
 <body>
-  <h1>보수총액 일할계산기 by HASJJ (v.2025.08)</h1>
+  <h1>보수총액 일할계산기 by HASJJ (v.2025.09)</h1>
   <div class="card">
     <div class="grid">
       <div>
         <label>기준기간 시작일</label>
         <div class="date-field" data-for="baseStart">
           <div class="seg">
-            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
           </div>
-          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
-          <input id="baseStart" type="date" class="native-date" />
         </div>
       </div>
       <div>
         <label>기준기간 종료일</label>
         <div class="date-field" data-for="baseEnd">
           <div class="seg">
-            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
           </div>
-          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
-          <input id="baseEnd" type="date" class="native-date" />
         </div>
       </div>
       </div>
@@ -215,28 +198,24 @@
         <label>조회기간 시작일</label>
         <div class="date-field" data-for="queryStart">
           <div class="seg">
-            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
           </div>
-          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
-          <input id="queryStart" type="date" class="native-date" />
         </div>
         </div>
         <div>
         <label>조회기간 종료일</label>
         <div class="date-field" data-for="queryEnd">
           <div class="seg">
-            <input type="text" inputmode="numeric" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
-            <span class="dot">-</span>
-            <input type="text" inputmode="numeric" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="yyyy" maxlength="4" placeholder="YYYY" aria-label="연도(YYYY)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="mm" maxlength="2" placeholder="MM" aria-label="월(MM)">
+            <span class="dot">.</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="dd" maxlength="2" placeholder="DD" aria-label="일(DD)">
           </div>
-          <button type="button" class="picker-btn" aria-label="달력 열기">달력</button>
-          <input id="queryEnd" type="date" class="native-date" />
         </div>
         </div>
     </div>
@@ -250,7 +229,7 @@
       <div class="value" id="resultValue">₩0</div>
       <div class="sub" id="resultSub"></div>
     </div>
-    <div class="desc muted">일수 계산: 시작일과 종료일 모두 포함(포함 기준). 주말/공휴일 미구분, 단순 일수 기준. 금액은 소수점 이하는 올림 처리.</div>
+    <div class="desc muted">일수 계산: 시작일과 종료일 모두 포함(포함 기준). 입력 형식 예: 2025.09.01 (세 자리 구분점). 주말/공휴일 미구분, 단순 일수 기준. 금액은 소수점 이하는 올림 처리.</div>
   </div>
 
   <div class="card">
@@ -266,10 +245,6 @@
   </div>
 
   <script>
-    // --- Platform detection (iOS) ---
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (isIOS) { document.body.classList.add('ios'); }
     // --- Utilities ---
     const $ = (id) => document.getElementById(id);
     const fmtKRW = (n) => {
@@ -310,66 +285,100 @@
     };
 
     // --- Date field (segmented) UX ---
-    const pad2 = (n) => String(n).padStart(2, '0');
-    const sanitizeDigits = (el, maxLen) => {
-      el.value = el.value.replace(/[^0-9]/g, '');
-      if (maxLen) el.value = el.value.slice(0, maxLen);
-    };
     const dateFieldRegistry = {};
-
     const installDateField = (container) => {
-      const native = container.querySelector('.native-date');
       const y = container.querySelector('.yyyy');
       const m = container.querySelector('.mm');
       const d = container.querySelector('.dd');
-      const btn = container.querySelector('.picker-btn');
 
-      const syncSegToNative = () => {
-        if (y.value.length === 4 && m.value.length >= 1 && d.value.length >= 1) {
-          const yy = Number(y.value);
-          const mm = Number(m.value);
-          const dd = Number(d.value);
-          if (mm >= 1 && mm <= 12) {
-            const test = new Date(Date.UTC(yy, mm - 1, dd));
-            if (test.getUTCFullYear() === yy && test.getUTCMonth() === (mm - 1) && test.getUTCDate() === dd) {
-              native.value = `${yy}-${pad2(mm)}-${pad2(dd)}`;
-              return;
-            }
-          }
+      const focusAndSelect = (el) => {
+        if (!el) return;
+        // Focus without scrolling the page
+        el.focus({ preventScroll: true });
+        // On next frame, select all to ensure mobile/iOS highlights correctly
+        setTimeout(() => {
+          try { el.select(); } catch {}
+          try { el.setSelectionRange(0, el.value.length); } catch {}
+        }, 0);
+      };
+
+      const syncClamp = () => {
+        // Ensure numeric and reasonable ranges without being over-strict
+        y.value = y.value.replace(/[^0-9]/g, '').slice(0, 4);
+        m.value = m.value.replace(/[^0-9]/g, '').slice(0, 2);
+        d.value = d.value.replace(/[^0-9]/g, '').slice(0, 2);
+      };
+
+      const autoAdvance = () => {
+        if (y.value.length === 4 && document.activeElement === y) {
+          focusAndSelect(m);
         }
-        // invalid combination: do not update native.value
+        if (m.value.length === 2 && document.activeElement === m) {
+          focusAndSelect(d);
+        }
+      };
+      const wireSelectAll = (el) => {
+        if (!el) return;
+        el.addEventListener('focus', () => focusAndSelect(el));
+        // Prevent mouseup from clearing the programmatic selection on desktop
+        el.addEventListener('mouseup', (e) => e.preventDefault());
+        // Prevent touchend from toggling selection on mobile browsers
+        el.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
+      };
+      wireSelectAll(y);
+      wireSelectAll(m);
+      wireSelectAll(d);
+
+      const fillFromString = (ymdStr) => {
+        if (!ymdStr) return;
+        const parts = ymdStr.trim().replace(/\//g, '-').replace(/\./g, '-').split('-');
+        if (parts.length !== 3) return;
+        const [yy, mm, dd] = parts;
+        y.value = (yy || '').replace(/[^0-9]/g, '').slice(0,4);
+        m.value = (mm || '').replace(/[^0-9]/g, '').replace(/^0+/, '').slice(0,2);
+        d.value = (dd || '').replace(/[^0-9]/g, '').replace(/^0+/, '').slice(0,2);
       };
 
-      const syncNativeToSeg = () => {
-        if (!native.value) return;
-        const [yy, mm, dd] = native.value.split('-');
-        y.value = yy || '';
-        m.value = (mm || '').replace(/^0/, '');
-        d.value = (dd || '').replace(/^0/, '');
+      const getYmdDash = () => {
+        if (y.value.length !== 4 || m.value.length === 0 || d.value.length === 0) return '';
+        const yy = Number(y.value);
+        const mm = Number(m.value);
+        const dd = Number(d.value);
+        const test = new Date(Date.UTC(yy, mm - 1, dd));
+        if (test.getUTCFullYear() !== yy || test.getUTCMonth() !== (mm - 1) || test.getUTCDate() !== dd) return '';
+        return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
       };
 
-      y.addEventListener('input', () => { sanitizeDigits(y, 4); if (y.value.length === 4) m.focus(); syncSegToNative(); });
-      m.addEventListener('input', () => { sanitizeDigits(m, 2); if (m.value.length === 2) d.focus(); syncSegToNative(); });
-      d.addEventListener('input', () => { sanitizeDigits(d, 2); syncSegToNative(); });
+      // Input handlers
+      y.addEventListener('input', () => { syncClamp(); autoAdvance(); });
+      m.addEventListener('input', () => { syncClamp(); autoAdvance(); });
+      d.addEventListener('input', () => { syncClamp(); });
 
+      // Backspace navigation
       m.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && m.value.length === 0) { y.focus(); e.preventDefault(); } });
       d.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && d.value.length === 0) { m.focus(); e.preventDefault(); } });
 
-      btn.addEventListener('click', () => {
-        if (typeof native.showPicker === 'function') native.showPicker();
-        else native.focus();
+      // Paste full date like yyyy.mm.dd or yyyy-mm-dd into year field
+      y.addEventListener('paste', (e) => {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (/^[0-9]{4}[.-][0-9]{1,2}[.-][0-9]{1,2}$/.test(text.trim())) {
+          e.preventDefault();
+          fillFromString(text.trim());
+          autoAdvance();
+        }
       });
 
-      native.addEventListener('change', syncNativeToSeg);
-      syncNativeToSeg();
-
-      // register in global registry
       const key = container.getAttribute('data-for');
       dateFieldRegistry[key] = {
-        native, y, m, d,
-        syncNativeToSeg,
-        setFromYmd: (ymd) => { if (!ymd) return; native.value = ymd; syncNativeToSeg(); }
+        y, m, d,
+        getYmdDash,
+        setFromYmd: (ymd) => fillFromString(ymd)
       };
+    };
+
+    const getDateFieldValue = (id) => {
+      const entry = dateFieldRegistry[id];
+      return entry ? entry.getYmdDash() : '';
     };
 
     document.querySelectorAll('.date-field').forEach(installDateField);
@@ -499,10 +508,10 @@
 
     $('calcBtn').addEventListener('click', () => {
       $('error').style.display = 'none';
-      const baseStartStr = $('baseStart').value;
-      const baseEndStr   = $('baseEnd').value;
-      const queryStartStr= $('queryStart').value;
-      const queryEndStr  = $('queryEnd').value;
+      const baseStartStr = getDateFieldValue('baseStart');
+      const baseEndStr   = getDateFieldValue('baseEnd');
+      const queryStartStr= getDateFieldValue('queryStart');
+      const queryEndStr  = getDateFieldValue('queryEnd');
       const amountRaw    = parseAmount($('baseAmount').value);
 
       if (!baseStartStr || !baseEndStr || !queryStartStr || !queryEndStr) {
