@@ -319,11 +319,27 @@
       };
       const wireSelectAll = (el) => {
         if (!el) return;
+        // Focus+select on focus event
         el.addEventListener('focus', () => focusAndSelect(el));
-        // Prevent mouseup from clearing the programmatic selection on desktop
-        el.addEventListener('mouseup', (e) => e.preventDefault());
-        // Prevent touchend from toggling selection on mobile browsers
-        el.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
+        // iOS Safari: ensure touch on the placeholder/center reliably triggers focus
+        // Use pointerdown (fires before focus) without preventDefault so the keyboard can open
+        el.addEventListener('pointerdown', (e) => {
+          if (e.pointerType === 'touch') {
+            if (document.activeElement !== el) {
+              // Delay to let native focus happen, then select
+              setTimeout(() => focusAndSelect(el), 0);
+            }
+          }
+        }, { passive: true });
+        // Desktop: keep selection consistent without blocking focus. Avoid preventDefault on mouse/touch.
+        // If the user clicks an already-focused input, re-select all.
+        el.addEventListener('mousedown', () => {
+          if (document.activeElement === el) {
+            setTimeout(() => {
+              try { el.select(); } catch {}
+            }, 0);
+          }
+        });
       };
       wireSelectAll(y);
       wireSelectAll(m);
